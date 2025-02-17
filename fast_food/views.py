@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,11 +8,15 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from .models import Product, CartItem, Orders, OrderItem
 from .serializers import (
-    ProductSerializer, OrderSerializer, RegisterSerializer, CartItemSerializer
+    ProductSerializer, OrderSerializer, RegisterSerializer, CartItemSerializer, LoginSerializer
 )
 from .permissions import IsAdminOrReadOnly, IsCustomerOrAdmin
 
 class RegisterView(APIView):
+    @extend_schema(
+        request=RegisterSerializer,  # Serializerni request uchun qo'shing
+        responses={201: "User created successfully with tokens"}
+    )
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -24,6 +29,10 @@ class RegisterView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
+    @extend_schema(
+        request=LoginSerializer,  # Serializerni request uchun qo'shing
+        responses={200: "User authenticated successfully with tokens"}  # Tokenlar to‘rlar bo‘lishi sharti
+    )
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")
@@ -37,12 +46,18 @@ class LoginView(APIView):
         return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
 
 class ProductViewSet(ModelViewSet):
+
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
 
 class CartAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=CartItemSerializer,  # Serializerni request uchun qo'shing
+        responses={200: "Cart items retrieved successfully", 201: "Cart item added successfully", 401: "Authentication failed"}  # Tokenlar to‘rlar bo‘lishi sharti
+    )
 
     def get(self, request):
         """Foydalanuvchining savatini ko‘rish"""
@@ -86,6 +101,11 @@ class CartAPIView(APIView):
 
 class CreateOrderAPIView(APIView):
     permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        request=OrderSerializer,  # Serializerni request uchun qo'shing
+        responses={200: "Order created successfully", 401: "Authentication failed"}  # Tokenlar to‘rlar bo‘lishi sharti
+    )
 
     def get(self, request):
         """Foydalanuvchining savatdagi mahsulotlarini ko‘rish"""
