@@ -65,7 +65,7 @@ SPECTACULAR_SETTINGS = {
     'SCHEMA_PATH_PREFIX': '/api/',  # Faqat `/api/` ostidagi endpointlarni ko‘rsatadi
     'SERVERS': [
         {'url': 'http://localhost:8000', 'description': 'Development Server'},
-        {'url': 'https://api.uzum.uz', 'description': 'Production Server'},
+        {'url': 'https://lesailes-api.onrender.com/', 'description': 'Production Server'},
     ],
     'PREPROCESSING_HOOKS': [],
     'POSTPROCESSING_HOOKS': [],
@@ -164,8 +164,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT =os.path.join( BASE_DIR / 'staticfiles')  # Statik fayllar yig'iladigan joy
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # STATICFILES_DIRS = [
 #     os.path.join(BASE_DIR, "static")
@@ -182,3 +181,5 @@ MEDIA_ROOT = "media"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'fast_food.CustomUser'
+
+SECURE_SSL_REDIRECT = True
